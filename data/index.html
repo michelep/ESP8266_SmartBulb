@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+    <head>
+	<meta charset="utf-8" />
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="SmartBulb" />
+        <meta name="author" content="Michele <o-zone@zerozone.it> Pinassi" />
+	<title>SmartBulb</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous" />
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+	<style>
+.card {
+    border-radius: 6px;
+    box-shadow: 0 2px 2px
+    rgba(204, 197, 185, 0.5);
+    background-color:#FFFFFF;
+    color:#252422;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+	</style>
+    </head>
+    <body>
+	<div class="container">
+	    <center><div id="result">&nbsp;</div></center>
+	    <h1 class="mt-5">SmartBulb</h1>
+	    <h5>%hostname%</h5>
+	    <div class="card-deck"><!-- CARD DECK A -->
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Temperature</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<h2 id="tempField"><img src="loader.gif"></h2>
+		    </div>
+		</div>
+	    </div><br/>
+	    <div class="card-deck"><!-- CARD DECK A -->
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Mode</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<select name="setMode" class="ajaxOnChange">
+			    <option value="0">All off</option>
+			    <option value="1">LightGame</option>
+			    <option value="2">Alarm</option>
+			    <option value="3">Manual</option>
+			</select>
+		    </div>
+		</div>
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Brightness</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="1" max="255" value="96" class="slider ajaxOnChange" id="brightness" name="setBright">
+		    </div>
+		</div>
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Speed</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="1" max="100" value="60" class="slider ajaxOnChange" id="speed" name="setSpeed">
+		    </div>
+		</div>
+	    </div><br/>
+	    <div class="card-deck"><!-- CARD DECK B -->
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Red</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="red" name="setR">
+		    </div>
+		</div>
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Green</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="green" name="setG">
+		    </div>
+		</div>
+		<div class="card bg-light mb-4">
+		    <div class="card-header">
+			<h2 class="card-header-title">Blue</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="blue" name="setB">
+		    </div>
+		</div>
+	    </div>
+	    <div class="accordion" id="alarmSection"><!-- ALARM -->
+		<div class="card"><!-- CONFIG -->
+		    <div class="card-header" id="headingAlarm">
+			<h5 class="mb-0">
+		    	    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseAlarm" aria-expanded="true" aria-controls="collapseAlarm">
+		    	        Alarms
+			    </button>
+			</h5>
+		    </div>
+		    <div class="collapse" id="collapseAlarm" aria-labelledby="headingAlarm" data-parent="#alarmSection">
+			<div class="card-body">
+			    <form class="form" method="POST" action="/post">
+				<input type="hidden" name="action" value="alarm">
+				<div class="form-row">
+				    <div class="col-md-3">
+		    			<label for="form_alarm_temp">Temp</label>
+		    			<input type="text" class="form-control" id="form_alarm_temp" name="alarm_temp" value="%alarm_temp%" />
+		    			<p class="text-muted">Temp trigger</p>
+				    </div>
+				    <div class="col-md-3">
+		    			<label for="form_alarm_hum">Hum</label>
+		    			<input type="text" class="form-control" id="form_alarm_hum" name="alarm_hum" value="%alarm_hum%" />
+		    			<p class="text-muted">Humidity trigger</p>
+				    </div>
+				    <div class="col-md-3">
+		    			<label for="form_alarm_aq">AirQ</label>
+		    			<input type="text" class="form-control" id="form_alarm_aq" name="alarm_aq" value="%alarm_aq%" />
+		    			<p class="text-muted">Air Quality trigger</p>
+				    </div>
+				    <div class="col-md-3">
+		    			<label for="form_alarm_hdex">Hdex</label>
+		    			<input type="text" class="form-control" id="form_alarm_hdex" name="alarm_hdex" value="%alarm_hdex%" />
+		    			<p class="text-muted">Humidex trigger</p>
+				    </div>
+				</div>
+				<input type="submit" class="btn btn-info" value="Save" />
+			    </form>
+			</div>
+		    </div>
+		</div>
+	    </div>
+	    <div class="accordion" id="configSection"><!-- CONFIGURATION -->
+		<div class="card"><!-- CONFIG -->
+		    <div class="card-header" id="headingManual">
+			<h5 class="mb-0">
+		    	    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseConfig" aria-expanded="true" aria-controls="collapseConfig">
+		    	        Configuration
+			    </button>
+			</h5>
+		    </div>
+		    <div class="collapse" id="collapseConfig" aria-labelledby="headingManual" data-parent="#configSection">
+			<div class="card-body">
+			    <form class="form" method="POST" action="/post">
+				<input type="hidden" name="action" value="config">
+				<div class="form-row">
+				    <div class="col-md-4">
+    		    			<label for="formAuthUser">Wifi ESSID</label>
+		    			<input type="text" class="form-control" id="form_wifi_essid" name="wifi_essid" value="%wifi_essid%" />
+		    			<p class="text-muted">Set your Wifi network name</p>
+				    </div>
+				    <div class="col-md-4">
+		    			<label for="formAuthPass">Wifi PSK</label>
+		    			<input type="text" class="form-control" id="form_wifi_password" name="wifi_password" value="%wifi_password%" />
+		    			<p class="text-muted">Your wifi password</p>
+				    </div>
+				    <div class="col-md-4">
+		    			<p>WiFi signal strenght (RSSI):</p>
+					<p><b>%wifi_rssi%</b> dBm</p>
+		    			<p class="text-muted">0-30dBm=Very Good, 31-50dBm=Good, 51-67dBm=Fair, 67-80dBm=Poor, >80dBm=Unstable</p>
+				    </div>
+				</div>
+				<div class="form-row">
+				    <div class="col-md-6">
+					<label for="formHostName">Hostname</label>
+					<input type="text" class="form-control" id="form_hostname" name="hostname" value="%hostname%" />
+					<p class="text-muted">Set hostname</p>
+				    </div>
+				</div>
+				<div class="form-row">
+				    <div class="col-md-6">
+					<label for="formNTPServer">NTP server</label>
+					<input type="text" class="form-control" id="form_ntp_server" name="ntp_server" value="%ntp_server%" />
+					<p class="text-muted">NTP server</p>
+				    </div>
+				    <div class="col-md-6">
+					<label for="formNTPTimeZone">NTP time zone</label>
+					<input type="text" class="form-control" id="form_ntp_timezone" name="ntp_timezone" value="%ntp_timezone%" />
+					<p class="text-muted">NTP time zone</p>
+				    </div>
+				</div>
+				<div class="form-row">
+				    <div class="col-md-4">
+    		    			<label for="formAuthUser">MQTT broker</label>
+		    			<input type="text" class="form-control" id="form_broker_host" name="broker_host" value="%broker_host%" />
+		    			<p class="text-muted">MQTT broker host/IP</p>
+				    </div>
+				    <div class="col-md-4">
+		    			<label for="formAuthPass">MQTT broker port</label>
+		    			<input type="text" class="form-control" id="form_broker_port" name="broker_port" value="%broker_port%" />
+		    			<p class="text-muted">MQTT broker port (default 1883)</p>
+				    </div>
+				    <div class="col-md-4">
+		    			<label for="formAuthPass">MQTT client ID</label>
+		    			<input type="text" class="form-control" id="form_client_id" name="client_id" value="%client_id%" />
+		    			<p class="text-muted">MQTT client ID</p>
+				    </div>
+				</div>
+				<input type="submit" class="btn btn-info" value="Save" /> or <a href="/config.json" class="btn btn-xs btn-info">Backup config</a>
+			    </form>
+			    <form class="form" method="GET" action="/restart">
+				<input type="submit" class="btn btn-warning" value="Restart" />
+			    </form>
+			</div>
+		    </div>
+		</div><!-- /CONFIG -->
+	    </div>
+	</div>
+	<div class="container">
+	    <p class="text-muted">Firmware %fw_name% %fw_version% - Uptime %uptime% secs - %timedate%</p>
+	</div>
+    </body>
+    <script>
+function ajaxCall(action, value) {
+  $.ajax({
+    url: 'ajax',
+    type: 'post',
+    data: { action: action, value: value },
+    success: function(data) {
+    }
+  });
+}
+function ajaxTimeout() {
+    $.ajax({
+	url: 'ajax',
+        type: 'post',
+	data: { action: 'getEnv', value: '' },
+	dataType: 'json',
+    }).done(function(data) {
+	$('#tempField').html(data.temp);
+    });
+    setTimeout(ajaxTimeout, 5000);
+}
+$(document).ready(function(){
+  $(".ajaxOnChange").change(function(){
+    var value=$(this).val();
+    var name=$(this).attr("name");
+    ajaxCall(name,value);
+  });
+  ajaxTimeout();
+});
+    </script>
+    <footer class="footer">
+        <div class="container">
+	    <div class="row justify-content-md-center">
+    	        <div class="text-center">
+            	    <hr class="small">
+            	    <p class="small">by Michele &lt;o-zone@zerozone.it&gt; Pinassi - <a href="http://www.zerozone.it">zerozone.it</a></p>
+        	</div>
+            </div>
+        </div>
+    </footer>
+</html>
