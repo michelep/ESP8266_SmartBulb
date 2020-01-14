@@ -17,11 +17,12 @@ FASTLED_USING_NAMESPACE
 #define COLOR_ORDER GRB
 
 #define FRAMES_PER_SECOND  120
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 CRGB leds[NUM_LEDS];
 
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, juggle, bpm };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
@@ -32,38 +33,56 @@ void initLeds() {
   FastLED.setBrightness(env["brightness"]);
 }
 
-void ledLoop() {
-  // Call the current pattern function once, updating the 'leds' array
-  // gPatterns[gCurrentPatternNumber]();
-  //  rainbowWithGlitter();
-  confetti();
-  
-  EVERY_N_MILLISECONDS( 20 ) { gHue++; } 
-
-  FastLED.setBrightness(env["brightness"]);
-
-  // send the 'leds' array out to the actual LED strip
-  FastLED.show();  
-  // insert a delay to keep the framerate modest
-  FastLED.delay(1000/FRAMES_PER_SECOND); 
+// Callback LedGame changing
+void lgCallback() {
+  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
 }
 
-void ledAlarm() {
-// #TODO
+void ledLoop() {
+  switch(int(env["mode"])) {
+    case LED_MODE_GAME: gPatterns[gCurrentPatternNumber]();
+      EVERY_N_MILLISECONDS( 20 ) { gHue++; } 
+      break; 
+    case LED_MODE_MOOD: ledMood();
+      break;
+    case LED_MODE_MANUAL: ledManual();
+      break;
+    default: ledClear();
+      break;
+  }
+    
+  FastLED.setBrightness(env["brightness"]);
+  FastLED.show();  
+  FastLED.delay(1000/env["speed"]); 
+}
+
+void ledMood() {
+  CRGBPalette16 palette;
+  switch(int(env["mood"])) {
+    case 0: palette = ForestColors_p;
+      break;
+    case 1: palette = OceanColors_p;
+      break;
+    case 2: palette = LavaColors_p;
+      break;
+    case 3: palette = RainbowStripeColors_p;
+      break;
+  }
+  uint8_t beat = beatsin8( 60, 64, 255);
+  for( int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+  }
 }
 
 void ledManual() {
-  FastLED.setBrightness(env["brightness"]);
   for(int i = 0; i < NUM_LEDS; i++) { 
     leds[i].setRGB( env["red"], env["green"], env["blue"]);
-    FastLED.show();
   }  
 }
 
 void ledClear() {
   for(int i = 0; i < NUM_LEDS; i++) { 
     leds[i] = CRGB::Black;
-    FastLED.show();
   }
 }
 
@@ -95,13 +114,6 @@ void confetti()
   leds[pos] += CHSV( gHue + random8(64), 200, 255);
 }
 
-void sinelon()
-{
-  // a colored dot sweeping back and forth, with fading trails
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  int pos = beatsin16( 13, 0, NUM_LEDS-1 );
-  leds[pos] += CHSV( gHue, 255, 192);
-}
 
 void bpm()
 {

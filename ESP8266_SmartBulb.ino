@@ -45,6 +45,11 @@ Scheduler runner;
 void mqttCallback();
 Task mqttTask(ENV_INTERVAL, TASK_FOREVER, &mqttCallback);
 
+#define LG_INTERVAL 30000 // LightGame change interval - every 15 seconds
+void lgCallback();
+Task lgTask(LG_INTERVAL, TASK_FOREVER, &lgCallback);
+
+
 // I2C MPU6050
 #include <Wire.h>
 #include <MPU6050.h>
@@ -94,7 +99,7 @@ _Config config; // Global config object
 
 #define LED_MODE_NONE 0
 #define LED_MODE_GAME 1
-#define LED_MODE_ALARM 2
+#define LED_MODE_MOOD 2
 #define LED_MODE_MANUAL 3
 
 long last, inactivityTimer=0;
@@ -174,12 +179,8 @@ void setup() {
   Serial.begin(115200);
   delay(10);
   
-  // Send a "BIP"...
+  // Buzzer PIN as output
   pinMode(BUZZER_PIN,OUTPUT);
-  analogWriteFreq(440);
-  analogWrite(BUZZER_PIN,512);
-  delay(200);
-  analogWrite(BUZZER_PIN,0);
   
   // print firmware and build data
   Serial.println();
@@ -245,6 +246,9 @@ void setup() {
   runner.addTask(mqttTask);
   mqttTask.enable();
 
+  runner.addTask(lgTask);
+  lgTask.enable();
+
   // Setup MQTT connection
   client.setServer(config.broker_host, config.broker_port);
   client.setCallback(mqttReceiver); 
@@ -273,6 +277,7 @@ void setup() {
 
   // Define default values
   env["brightness"] = 96;
+  env["speed"] = 120;
   env["mode"] = LED_MODE_NONE;
   
   // Initialize LEDs strip
@@ -280,6 +285,7 @@ void setup() {
 
   // Initialize alarms
 
+  // Go!
 }
 
 void loop() {
@@ -303,17 +309,9 @@ void loop() {
     actAllow=false;
     inactivityTimer=0;
   }
-  // 
-  switch(int(env["mode"])) {
-    case LED_MODE_GAME: ledLoop();
-      break; 
-    case LED_MODE_ALARM: ledAlarm();
-      break;
-    case LED_MODE_MANUAL: ledManual();
-      break;
-    default: ledClear();
-      break;
-  }
+  //   
+  ledLoop();
+  //
   if((millis() - last) > 2100) { 
     actAllow=true;
     last = millis();

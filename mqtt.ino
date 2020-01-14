@@ -23,6 +23,8 @@ bool mqttConnect() {
       return false;
     }
     return true;
+  } else {
+    return false;
   }
 }
 
@@ -50,9 +52,12 @@ void mqttCallback() {
   if(WiFi.status() != WL_CONNECTED) {
     connectToWifi();
   }
-  // MQTT not connected? Connect!
+  // MQTT not connected? Connect or return false;
   if (!client.connected()) {
-    mqttConnect();
+    if(!mqttConnect()) {
+      // MQTT connection failed or disabled
+      return;
+    }
   }
   // Update environment value  
   env["temp"] = mpu.readTemperature();

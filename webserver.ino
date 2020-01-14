@@ -114,7 +114,10 @@ void initWebServer() {
         env["brightness"] = atoi(request->getParam("value", true)->value().c_str());
       }
       if(action.equals("setSpeed")) {
-        
+        env["speed"] = atoi(request->getParam("value", true)->value().c_str());        
+      }
+      if(action.equals("setMood")) {
+        env["mood"] = atoi(request->getParam("value", true)->value().c_str());
       }
       if(action.equals("setMode")) {
         env["mode"] = atoi(request->getParam("value", true)->value().c_str());
