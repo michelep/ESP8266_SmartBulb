@@ -22,14 +22,33 @@ bool mqttConnect() {
       DEBUG("[MQTT] Connection failed");    
       return false;
     }
+    // subscribe MQTT topics
+    client.subscribe("smartbulb/set_mode");
     return true;
   } else {
     return false;
   }
 }
 
-void mqttReceiver(char* topic, byte* payload, unsigned int length) {
-  DEBUG("Message arrived: "+String(topic));
+void mqttReceiver(char* _topic, byte* payload, unsigned int length) {
+  String topic = String(_topic);
+  payload[length] = '\0';
+  DEBUG("[MQTT] Received "+topic);
+  if(topic.equals("smartbulb/set_mode")) {
+// Ugly, i know. I'll try to get a better way to interprete payload. 
+    if(!strncmp((char *)payload, "sound", length)) {
+      config.mode = LED_MODE_SOUND;
+    }  
+    if(!strncmp((char *)payload, "mood", length)) {
+      config.mode = LED_MODE_MOOD;
+    }  
+    if(!strncmp((char *)payload, "game", length)) {
+      config.mode = LED_MODE_GAME;
+    }  
+    if(!strncmp((char *)payload, "off", length)) {
+      config.mode = LED_MODE_NONE;
+    }  
+  }
 }
 
 bool mqttPublish(char *topic, char *payload) {

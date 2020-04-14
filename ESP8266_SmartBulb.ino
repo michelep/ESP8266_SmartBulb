@@ -8,9 +8,7 @@
 // Firmware data
 const char BUILD[] = __DATE__ " " __TIME__;
 #define FW_NAME         "smartbulb"
-#define FW_VERSION      "0.0.1"
-
-#define BUZZER_PIN D3
+#define FW_VERSION      "0.0.3"
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -49,15 +47,11 @@ Task mqttTask(ENV_INTERVAL, TASK_FOREVER, &mqttCallback);
 void lgCallback();
 Task lgTask(LG_INTERVAL, TASK_FOREVER, &lgCallback);
 
-
 // I2C MPU6050
 #include <Wire.h>
 #include <MPU6050.h>
 
 MPU6050 mpu;
-
-// TimeALarm
-#include <TimeAlarms.h>
 
 // NTP
 NTPSyncEvent_t ntpEvent;
@@ -65,14 +59,6 @@ bool syncEventTriggered = false; // True if a time even has been triggered
 
 // Web server
 AsyncWebServer server(80);
-
-struct _Alarm {
-  bool enabled;
-  uint8_t hour;
-  uint8_t minute;
-  uint8_t dow;
-  uint8_t mode;
-};
 
 // Config
 struct _Config {
@@ -85,11 +71,13 @@ struct _Config {
   char broker_host[32];
   unsigned int broker_port;
   char client_id[18];
+  // LED Config
+  int8_t red, green, blue;
+  int16_t brightness, speed, timeout;
+  int8_t mode, mood;
   // NTP Config
   char ntp_server[16];
   int8_t ntp_timezone;
-  // Alarm
-  _Alarm alarms[5];
 };
 
 #define CONFIG_FILE "/config.json"
@@ -100,13 +88,17 @@ _Config config; // Global config object
 #define LED_MODE_NONE 0
 #define LED_MODE_GAME 1
 #define LED_MODE_MOOD 2
-#define LED_MODE_MANUAL 3
+#define LED_MODE_SOUND 3
+#define LED_MODE_MANUAL 4
 
 long last, inactivityTimer=0;
 bool actAllow=true;
 
 // Environmental values
 DynamicJsonDocument env(128);
+
+// Define microphone input pin
+#define MIC_PIN A0
 
 // Format SPIFFS if mount failed
 #define FORMAT_SPIFFS_IF_FAILED 1
@@ -178,10 +170,7 @@ bool connectToWifi() {
 void setup() {
   Serial.begin(115200);
   delay(10);
-  
-  // Buzzer PIN as output
-  pinMode(BUZZER_PIN,OUTPUT);
-  
+    
   // print firmware and build data
   Serial.println();
   Serial.println();
@@ -274,17 +263,10 @@ void setup() {
   mpu.setZeroMotionDetectionThreshold(10);
   mpu.setZeroMotionDetectionDuration(5);  
   mpu.setDHPFMode(MPU6050_DHPF_5HZ);
-
-  // Define default values
-  env["brightness"] = 96;
-  env["speed"] = 120;
-  env["mode"] = LED_MODE_NONE;
   
   // Initialize LEDs strip
   initLeds();
-
-  // Initialize alarms
-
+  
   // Go!
 }
 
@@ -294,27 +276,34 @@ void loop() {
   
   // Scheduler
   runner.execute();
-
+ 
   // NTP ?
   if(syncEventTriggered) {
     processSyncEvent(ntpEvent);
     syncEventTriggered = false;
   }
-  
+        
   // handle MPU6050 data
   Activites act = mpu.readActivites();
   if((actAllow)&&(act.isActivity)) {
-    env["mode"] = int(env["mode"])+1;
-    if(env["mode"] > LED_MODE_MANUAL) { env["mode"] = LED_MODE_NONE; }
+    config.mode = config.mode+1;
+    if(config.mode > LED_MODE_MANUAL) { config.mode = LED_MODE_NONE; }
+    env["mode"] = config.mode;
     actAllow=false;
     inactivityTimer=0;
   }
-  //   
+
+  // MQTT loop
+  client.loop();
+  
+  // Led Loop
   ledLoop();
+  
   //
-  if((millis() - last) > 2100) { 
+  if((millis() - last) > 1100) { 
     actAllow=true;
     last = millis();
     inactivityTimer++;
+    env["inactivity"] = inactivityTimer;
   }
 }

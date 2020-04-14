@@ -39,7 +39,7 @@
 		</div>
 	    </div><br/>
 	    <div class="card-deck"><!-- CARD DECK A -->
-		<div class="card bg-light mb-4">
+		<div class="card bg-light mb-3">
 		    <div class="card-header">
 			<h2 class="card-header-title">Mode</h2>
 		    </div>
@@ -48,11 +48,20 @@
 			    <option value="0">All off</option>
 			    <option value="1">LightGame</option>
 			    <option value="2">Mood</option>
-			    <option value="3">Manual</option>
+			    <option value="3">Sound</option>
+			    <option value="4">Manual</option>
 			</select>
 		    </div>
 		</div>
-    <div class="card bg-light mb-4">
+		<div class="card bg-light mb-3">
+		    <div class="card-header">
+			<h2 class="card-header-title">Timeout</h2>
+		    </div>
+		    <div class="card-body text-center">
+			<input type="range" min="0" max="360" value="%timeout%" class="slider ajaxOnChange" id="timeout" name="setTimeout">
+		    </div>
+		</div>
+		<div class="card bg-light mb-3">
 		    <div class="card-header">
 			<h2 class="card-header-title">Mood</h2>
 		    </div>
@@ -65,22 +74,22 @@
 			</select>
 		    </div>
 		</div>
-		<div class="card bg-light mb-4">
+		<div class="card bg-light mb-3">
 		    <div class="card-header">
 			<h2 class="card-header-title">Speed</h2>
 		    </div>
 		    <div class="card-body text-center">
-			<input type="range" min="10" max="200" value="120" class="slider ajaxOnChange" id="speed" name="setSpeed">
+			<input type="range" min="10" max="200" value="%speed%" class="slider ajaxOnChange" id="speed" name="setSpeed">
 		    </div>
 		</div>
 	    </div><br/>
 	    <div class="card-deck"><!-- CARD DECK B -->
-        <div class="card bg-light mb-3">
+    		<div class="card bg-light mb-3">
     		    <div class="card-header">
     			<h2 class="card-header-title">Brightness</h2>
     		    </div>
     		    <div class="card-body text-center">
-    			<input type="range" min="1" max="255" value="96" class="slider ajaxOnChange" id="brightness" name="setBright">
+    			<input type="range" min="1" max="255" value="%bright%" class="slider ajaxOnChange" id="brightness" name="setBright">
     		    </div>
     		</div>
 		<div class="card bg-light mb-3">
@@ -88,7 +97,7 @@
 			<h2 class="card-header-title">Red</h2>
 		    </div>
 		    <div class="card-body text-center">
-			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="red" name="setR">
+			<input type="range" min="1" max="255" value="%red%" class="slider ajaxOnChange" id="red" name="setR">
 		    </div>
 		</div>
 		<div class="card bg-light mb-3">
@@ -96,7 +105,7 @@
 			<h2 class="card-header-title">Green</h2>
 		    </div>
 		    <div class="card-body text-center">
-			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="green" name="setG">
+			<input type="range" min="1" max="255" value="%green%" class="slider ajaxOnChange" id="green" name="setG">
 		    </div>
 		</div>
 		<div class="card bg-light mb-3">
@@ -104,54 +113,8 @@
 			<h2 class="card-header-title">Blue</h2>
 		    </div>
 		    <div class="card-body text-center">
-			<input type="range" min="1" max="255" value="60" class="slider ajaxOnChange" id="blue" name="setB">
+			<input type="range" min="1" max="255" value="%blue%" class="slider ajaxOnChange" id="blue" name="setB">
 		    </div>
-		</div>
-	    </div>
-	    <div class="accordion" id="alarmSection"><!-- ALARM -->
-		<div class="card"><!-- CONFIG -->
-		    <div class="card-header" id="headingAlarm">
-			<h5 class="mb-0">
-		    	    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseAlarm" aria-expanded="true" aria-controls="collapseAlarm">
-		    	        Alarms
-			    </button>
-			</h5>
-		  </div>
-		  <div class="collapse" id="collapseAlarm" aria-labelledby="headingAlarm" data-parent="#alarmSection">
-			  <div class="card-body">
-			    <form class="form" method="POST" action="/post">
-				      <input type="hidden" name="action" value="alarm">
-				      <div class="form-row">
-				            <div class="col-md-3">
-		    			             <label for="form_alarm_1_hour">HHMM</label>
-		    			             <input type="text" class="form-control" id="form_alarm_1_hour" name="alarm_1_hour" value="%alarm_1_hour%" />
-		    			             <p class="text-muted">Time trigger, 0000 for midnight, 1230 for half past twelve. Max value is 2359 (one before midnight).</p>
-				            </div>
-				            <div class="col-md-3">
-		    			             <label for="form_alarm_1_dow">Days of Week</label>
-		    			             <input type="text" class="form-control" id="form_alarm_1_dow" name="alarm_1_dow" value="%alarm_1_dow%" />
-		    			             <p class="text-muted">1=Sun, 2=Mon, 4=Tue, 8=Wed, 16=Thu, 32=Fri, 64=Sat. 0=None, 128=All</p>
-				            </div>
-                    <div class="col-md-3">
-		    			             <label for="form_alarm_1_mood">Mood</label>
-		    			             <select class="form-control" id="form_alarm_1_mood" name="alarm_1_mood">
-                             <option value="0">Forest</option>
-                             <option value="1">Relax</option>
-                             <option value="2">Wake Up</option>
-                             <option value="3">Daytime</option>
-                           </select>
-		    			             <p class="text-muted">Choose mood to activate</p>
-				            </div>
-				            <div class="col-md-3">
-		    			             <label for="form_alarm_timeout">Timeout</label>
-		    			             <input type="text" class="form-control" id="form_alarm_1_timeout" name="alarm_1_timeout" value="%alarm_1_timeout%" />
-		    			             <p class="text-muted">Run for how much seconds? (0 for forever)</p>
-				            </div>
-				      </div>
-				    <input type="submit" class="btn btn-info" value="Save" />
-			    </form>
-			</div>
-		 </div>
 		</div>
 	    </div>
 	    <div class="accordion" id="configSection"><!-- CONFIGURATION -->

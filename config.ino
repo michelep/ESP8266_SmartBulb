@@ -31,7 +31,16 @@ bool loadConfigFile() {
       strlcpy(config.broker_host, root["broker_host"], sizeof(config.broker_host));
       config.broker_port = root["broker_port"] | 1883;
       strlcpy(config.client_id, root["client_id"] | "smartbulb", sizeof(config.client_id));
-      
+
+      config.speed = root["speed"] | 120;
+      config.brightness = root["brightness"] | 96;
+      config.timeout = root["timeout"] | 30;
+      config.red = root["red"] | 0;
+      config.green = root["green"] | 0;
+      config.blue = root["blue"] | 0;
+      config.mode = root["mode"] | 0;
+      config.mood = root["mood"] | 0;
+           
       strlcpy(config.ntp_server, root["ntp_server"] | "time.ien.it", sizeof(config.ntp_server));
       config.ntp_timezone = root["ntp_timezone"] | 1;
       DEBUG("[INIT] Configuration loaded");
@@ -53,6 +62,15 @@ bool saveConfigFile() {
   root["client_id"] = config.client_id;
   root["ntp_server"] = config.ntp_server;
   root["ntp_timezone"] = config.ntp_timezone;
+
+  root["speed"] = config.speed;
+  root["brightness"] = config.brightness;
+  root["timeout"] = config.timeout;
+  root["red"] = config.red;
+  root["green"] = config.green;
+  root["blue"] = config.blue;
+  root["mode"] = config.mode;
+  root["mood"] = config.mood;
   
   configFile = SPIFFS.open(CONFIG_FILE, "w");
   if(!configFile) {

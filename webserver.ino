@@ -27,6 +27,27 @@ String templateProcessor(const String& var)
   if(var=="temp") {
     return env["temp"];
   }  
+  if(var=="speed") {
+    return String(config.speed);
+  }  
+  if(var=="brightness") {
+    return String(config.brightness);
+  }
+  if(var=="mode") {
+    return String(config.mode);
+  }    
+  if(var=="mood") {
+    return String(config.mood);
+  }    
+  if(var=="red") {
+    return String(config.red);
+  }  
+  if(var=="green") {
+    return String(config.green);
+  }  
+  if(var=="blue") {
+    return String(config.blue);
+  }  
   //
   // Config values
   //
@@ -111,26 +132,38 @@ void initWebServer() {
       }
       // SET
       if(action.equals("setBright")) {
-        env["brightness"] = atoi(request->getParam("value", true)->value().c_str());
+        config.brightness = atoi(request->getParam("value", true)->value().c_str());
+        response = String("OK");
       }
       if(action.equals("setSpeed")) {
-        env["speed"] = atoi(request->getParam("value", true)->value().c_str());        
+        config.speed = atoi(request->getParam("value", true)->value().c_str());        
+        response = String("OK");
+      }
+      if(action.equals("setTimeout")) {
+        config.timeout = atoi(request->getParam("value", true)->value().c_str());        
+        response = String("OK");
       }
       if(action.equals("setMood")) {
-        env["mood"] = atoi(request->getParam("value", true)->value().c_str());
+        config.mood = atoi(request->getParam("value", true)->value().c_str());
+        response = String("OK");
       }
       if(action.equals("setMode")) {
-        env["mode"] = atoi(request->getParam("value", true)->value().c_str());
+        config.mode = atoi(request->getParam("value", true)->value().c_str());
+        response = String("OK");
       }
       if(action.equals("setR")) {
-        env["red"] = atoi(request->getParam("value", true)->value().c_str());
+        config.red = atoi(request->getParam("value", true)->value().c_str());
+        response = String("OK");
       }
       if(action.equals("setG")) {
-        env["green"] = atoi(request->getParam("value", true)->value().c_str());        
+        config.green = atoi(request->getParam("value", true)->value().c_str());        
+        response = String("OK");
       }
       if(action.equals("setB")) {
-        env["blue"] = atoi(request->getParam("value", true)->value().c_str());
+        config.blue = atoi(request->getParam("value", true)->value().c_str());
+        response = String("OK");
       }
+      inactivityTimer=0;
     }
     request->send(200, "text/plain", response);
   });
