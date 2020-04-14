@@ -1,1 +1,1 @@
-{"wifi_essid":"","wifi_password":"","hostname":"smartbulb","broker_host":"","broker_port":1883,"client_id":"smartbulb","ntp_server":"time.ien.it","ntp_timezone":1}
+{"wifi_essid":"","wifi_password":"","hostname":"smartbulb","broker_host":"","broker_port":1883,"client_id":"smartbulb","ntp_server":"time.ien.it","ntp_timezone":1,"speed":120,"brightness":96,"timeout":0,"red":0,"green":0,"blue":0,"mode":3,"mood":0}
