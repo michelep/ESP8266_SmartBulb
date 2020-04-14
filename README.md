@@ -10,7 +10,7 @@ Play nice lightshows on WS2812B "NeoPixel" LEDs, using (FastLed library)[http://
 
 ![ESP8266_SmartBulb](https://raw.githubusercontent.com/michelep/ESP8266_SmartBulb/master/images/2.jpg)
 
-More details on (zerozone.it)[https://www.zerozone.it]
+More details on [zerozone.it](https://www.zerozone.it)
 
 ![ESP8266_SmartBulb](https://raw.githubusercontent.com/michelep/ESP8266_SmartBulb/master/images/3.jpg)
 
